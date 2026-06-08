@@ -1,0 +1,35 @@
+# Copy to configs/pilot/<client_slug>.yaml and edit pilot.* + targets.*
+# Run: bash scripts/run_pilot.sh --config configs/pilot/<client_slug>.yaml
+
+base_config: configs/wedge_a.yaml
+
+pilot:
+  id: client_acme_splitter
+  title: "Acme Corp — 50/50 C-band splitter pilot"
+  client_name: "Acme Photonics Inc."
+  company_name: "[Your company]"
+  contact_email: "[you@example.com]"
+  platform: "EBL research — describe client's lithography assumptions"
+  wavelength_nm: "1550"
+  duration_weeks: 6
+
+targets:
+  split_ratio_1550: 0.5
+  split_ratio_tolerance: 0.05
+  max_insertion_loss_db: 12.0
+
+deliverables:
+  dir: data/pilot/client_acme_splitter/deliverables
+  top_k: 10
+  include_gds: true
+
+champions: []  # filled after search; or list known reference masks
+
+sources:
+  metrics_path: data/pilot/client_acme_splitter/wedge_a_metrics.json
+  ranking_eval: data/pilot/client_acme_splitter/ranking_eval.json
+  sim_budget_dir: data/pilot/client_acme_splitter/sim_budget
+
+# Optional: point wedge data root at client-specific copy after first run
+# data:
+#   wedge_root: data/pilot/client_acme_splitter

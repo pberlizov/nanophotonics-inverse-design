@@ -1,0 +1,56 @@
+# Multi-stage C-band broadband discovery (contribution track).
+# Search grid is coarse (5 λ); verify winners at wl_step 0.005.
+
+phase: 0
+device: power_splitter_50_50
+
+targets:
+  split_ratio_1550: 0.5
+  split_ratio_tolerance: 0.05
+  max_insertion_loss_db: 12.0
+
+meep:
+  recipe_version: phase0_v1
+  resolution: 25
+  mask_flip_y: true
+
+data:
+  root: data/phase0
+  manifest: data/phase0/manifest.csv
+
+search:
+  objective: broadband
+  weight_split: 1.0
+  weight_il: 0.10
+  drc_penalty: 1.0
+  flatness_weight: 0.35
+
+broadband:
+  wl_start: 1.53
+  wl_stop: 1.57
+  wl_step: 0.01
+  verify_wl_step: 0.005
+  max_worst_split_error: 0.05
+
+track_b:
+  broadband_wavelengths_um: [1.53, 1.54, 1.55, 1.56, 1.57]
+  latent_meep_search:
+    output_dir: data/phase1/broadband_hunt/explore
+    objective: broadband
+    latent_mode: residual
+    residual_dims: 16
+    residual_bound: 0.06
+
+hunt:
+  output_dir: data/phase1/broadband_hunt
+  # Residual refinement around promoted narrowband champions
+  center_latents:
+    - data/phase1/meep_search_local/candidates/latents/local_00022_latent.npy
+    - data/phase1/wedge_a/meep_gated_shortlist/round_rank/latents/cand_000261_latent.npy
+    - data/phase1/wedge_a/meep_gated_shortlist/latents/cand_000160_latent.npy
+    - data/phase1/meep_search_deep/candidates/latents/meep_bo_00128_latent.npy
+  refine_trials_per_center: 25
+  residual_dims: 16
+  residual_bound: 0.04
+  latent_explore_trials: 40
+  latent_mode: residual

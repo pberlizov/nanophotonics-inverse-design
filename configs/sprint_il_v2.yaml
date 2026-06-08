@@ -1,0 +1,30 @@
+# Sprint v2 IL/T — balanced split+IL after flux audit (T~1-3% is physics, not monitor-only).
+# Hypothesis: weight_il=0.40 + stronger stage-2 split penalty finds in-spec IL ≤12 dB.
+
+phase: sprint_v2
+targets:
+  split_ratio_1550: 0.5
+  split_ratio_tolerance: 0.05
+  max_insertion_loss_db: 12.0
+
+meep:
+  recipe_version: phase0_v1
+  resolution: 25
+  mask_flip_y: true
+
+data:
+  root: data/phase0
+
+search:
+  objective: multi
+  weight_split: 1.0
+  weight_il: 0.40
+  drc_penalty: 1.0
+
+il_hunt:
+  output_dir: data/phase1/sprint_il_v2
+  stage1_trials: 80
+  stage2_trials_per_seed: 40
+  stage2_top_seeds: 5
+  sigma_range: [0.02, 0.12]
+  stage2_split_penalty: 25.0

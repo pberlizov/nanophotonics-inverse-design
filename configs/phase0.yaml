@@ -1,0 +1,79 @@
+# Phase 0 benchmark — 50/50 EBL power splitter (C-band)
+# See docs/PHASE0_GETTING_STARTED.md, docs/INSTALL.md, docs/ROADMAP.md
+
+python:
+  required: "3.12.12"  # drcgenerator pyproject: requires-python == 3.12.12
+  install_doc: docs/INSTALL.md
+
+phase: 0
+schedule:
+  target_days: 10
+  conservative_weeks: 4
+device: power_splitter_50_50
+platform: ebl  # ebl | photolitho
+
+wavelength_nm:
+  center: 1550
+  band_min: 1500
+  band_max: 1600
+  sample_points: [1500, 1550, 1600]
+
+targets:
+  split_ratio_1550: 0.5
+  split_ratio_tolerance: 0.05  # ±5% per arm → revisit after first sims
+
+manifold:
+  implementation: drcgenerator
+  model: EBeamModel
+  repo: external/drcgenerator
+  # Latent dim and paths come from drcgenerator package after install
+
+simulator:
+  backend: meep
+  recipe_doc: docs/sim_recipe_phase0.md
+  setup_doc: docs/MEEP_SETUP.md
+
+meep:
+  recipe_version: phase0_v1   # v0 corpus frozen in sim_results.csv
+  # Mesh-stable cross-check: phase0_v1_sdf_geom (promoted 2026-06; triple-pass on champions)
+  mesh_stable_recipe_version: phase0_v1_sdf_geom
+  mesh_stable_sdf_smooth_um: 0.04
+  wavelength_um: 1.55
+  resolution: 25        # pixels/µm — use 15 for quick pilots
+  cell_size_um: 6.0
+  design_size_um: 4.0
+  pml_um: 0.5
+  wg_width_um: 0.45
+  eps_si: 12.0
+  eps_sio2: 2.25
+  mask_flip_y: true   # ref ~0.61 vs ~0.33; closer to 0.5 in-template
+  use_flux_decay: true
+  min_runtime_factor: 40
+  decay_threshold: 0.001
+  runtime_cap: 3000
+
+data:
+  root: data/phase0
+  decodes: data/phase0/decodes
+  sim: data/phase0/sim
+  manifest: data/phase0/manifest.csv
+
+search:
+  method: bayesian_optimization  # bo | cmaes | random
+  n_iterations: 200
+  n_verify_fdtd: 10
+
+surrogate:
+  architecture: latent_mlp  # latent_mlp | mask_mlp | mask_cnn
+  source_filter: all       # all | perturb | perlin
+  mask_pool: 6
+  holdout_fraction: 0.2
+
+active_learning:
+  n_trials: 100
+  meep_verify_top_k: 5
+  architecture: mask_mlp
+  source_filter: perturb
+
+drc:
+  checker: heuristic  # heuristic | drcgenerator_rules — tighten later

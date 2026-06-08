@@ -1,0 +1,16 @@
+# Phase 0 extras (install into project venv after drcgenerator)
+# uv pip install -r requirements-phase0.txt --python .venv/bin/python
+# Track C: uv pip install invrs-gym invrs-opt --python .venv/bin/python
+
+numpy>=2.0
+matplotlib>=3.10
+scipy>=1.11
+pandas>=2.0
+tqdm>=4.66
+pyyaml>=6.0
+optuna>=3.0
+scikit-learn>=1.3
+joblib>=1.3
+
+# Optional: mask CNN surrogate
+# torch>=2.0

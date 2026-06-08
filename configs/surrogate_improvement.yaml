@@ -1,0 +1,25 @@
+# Train + evaluate surrogate variants after corpus merge.
+# Run: bash scripts/run_surrogate_improvement.sh
+
+corpus: data/phase0/sim_results_phase0_v1_all.csv
+manifest: data/phase0/manifest.csv
+sim_budget_surrogate: data/phase1/wedge_a/surrogate_mask_perturb  # used for B=50/100 rank policy
+
+variants:
+  - name: latent_mlp_baseline
+    config: configs/wedge_a.yaml
+    output_dir: data/phase1/wedge_a/surrogate
+
+  - name: mask_mlp_split
+    config: configs/wedge_a_mask.yaml
+    output_dir: data/phase1/wedge_a/surrogate_mask_perturb
+
+  - name: mask_mlp_abserr
+    config: configs/wedge_a_mask_abserr.yaml
+    output_dir: data/phase1/wedge_a/surrogate_mask_abserr
+
+al:
+  config: configs/wedge_a_mask.yaml
+  from_round: 2
+  to_round: 5
+  skip_meep: false

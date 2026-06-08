@@ -1,0 +1,23 @@
+# Path A — refine champion latent z on invrs-gym Ceviche (grad through decode_soft)
+
+challenge: ceviche_lightweight_power_splitter
+template_seed: 0
+
+optimizer:
+  steps: 150
+  learning_rate: 0.02
+  grad_clip_norm: 1.0
+  patience: 8
+  min_delta: 0.0001
+
+champions:
+  - id: local_00022
+    latent: data/phase1/meep_search_local/candidates/latents/local_00022_latent.npy
+  - id: meep_bo_00128
+    latent: data/phase1/meep_search_deep/candidates/latents/meep_bo_00128_latent.npy
+  - id: meep_bo_00093
+    latent: data/phase0/meep_search_100/candidates/latents/meep_bo_00093_latent.npy
+  - id: cand_000003
+    latent: data/phase1/wedge_a/meep_gated_shortlist/round3/latents/cand_000003_latent.npy
+  - id: cand_000261
+    latent: data/phase1/wedge_a/meep_gated_shortlist/round_rank/latents/cand_000261_latent.npy

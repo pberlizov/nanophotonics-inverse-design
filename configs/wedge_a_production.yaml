@@ -1,0 +1,71 @@
+# Production wedge A — frozen surrogate, AL-expanded corpus, 5× sim-budget replicates.
+# Run: bash scripts/run_production_pipeline.sh
+# MEEP-only replicates: bash scripts/run_sim_budget_replicates.sh
+
+base_config: configs/wedge_a.yaml
+
+wedge: A_production
+
+data:
+  sim_corpus: data/phase0/sim_results_phase0_v1_all.csv
+  wedge_root: data/phase1/wedge_a
+
+# Production ranker (promoted 2026-05-26): merged corpus + σ feature.
+# Frozen 5× baseline weights: data/phase1/wedge_a/surrogate_production/
+surrogate:
+  architecture: mask_mlp
+  source_filter: perturb_plus_search
+  target: split_ratio_upper
+  output_dir: data/phase1/wedge_a/surrogate_improved
+  min_ok: 80
+  mask_pool: 6
+  hidden: "256,128,64"
+  max_iter: 800
+  sigma_feature: true
+  min_ok: 80
+  mask_pool: 6
+  hidden: "256,128,64"
+  max_iter: 800
+
+ranking_gate:
+  top_k: 20
+  sources: perturb_plus_search
+  require_ranking_wins: true
+
+al:
+  config: configs/wedge_a_mask.yaml
+  from_round: 2
+  to_round: 5
+  meep_verify_k: 20
+  n_proposals: 1500
+  merge_into: data/phase0/sim_results_phase0_v1_all.csv
+  retrain_after_each_round: true
+
+sim_budget:
+  budgets: [30, 50, 100]
+  output_dir: data/phase1/wedge_a/sim_budget
+  # Trim policies here to save MEEP (each adds B calls per replicate).
+  policies:
+    - random_perturb
+    - sigma_meep
+    - surrogate_rank
+    - hierarchical_35
+    - hierarchical_50
+    - hierarchical_65
+  sigma_range: [0.008, 0.04]
+  proposals_multiplier: 30
+  hierarchical_sigma_fraction: 0.35
+  diverse_top_k: true
+  diverse_min_hamming: 0.02
+
+champions:
+  enabled: true
+  hierarchical_sigma_span: 0.012
+  hierarchical_sigma_span_wide: 0.02
+
+replication:
+  n_replicates: 5
+  base_seed: 2026
+  output_dir: data/phase1/wedge_a/sim_budget/replicates
+  metrics_aggregate: data/phase1/wedge_a/sim_budget_replicates.json
+  report_md: data/phase1/wedge_a/sim_budget_replication_report.md

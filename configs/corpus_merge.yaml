@@ -1,0 +1,34 @@
+# Sources merged into sim_results_phase0_v1_all.csv for surrogate training.
+# Run: python scripts/merge_search_labels_into_corpus.py
+
+corpus: data/phase0/sim_results_phase0_v1_all.csv
+backup: true
+
+sources:
+  - kind: top_candidates
+    path: data/phase1/meep_search_local/top_candidates.csv
+    source: meep_search_local
+  - kind: trials
+    path: data/phase1/meep_search_local/meep_search_local_trials.csv
+    source: meep_search_local
+  - kind: top_candidates
+    path: data/phase1/meep_search_deep/top_candidates.csv
+    source: meep_search_deep
+  - kind: trials
+    path: data/phase1/meep_search_deep/meep_search_trials.csv
+    source: meep_search_deep
+  - kind: top_candidates
+    path: data/phase0/meep_search_100/top_candidates.csv
+    source: meep_search_phase0
+  - kind: trials
+    path: data/phase0/meep_search_100/meep_search_trials.csv
+    source: meep_search_phase0
+  - kind: sim_budget_replicates
+    path: data/phase1/wedge_a/sim_budget/replicates
+    source: sim_budget
+    base_seed: 2026
+    materialize_masks: true
+    mask_cache_dir: data/phase1/corpus_materialized/masks
+
+manifest: data/phase0/manifest.csv
+patch_manifest: true

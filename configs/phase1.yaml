@@ -1,0 +1,59 @@
+# Phase 1 — scaled inverse design (post week-2 champion)
+# See docs/PHASE1_DEEP_DEV.md
+
+phase: 1
+extends: phase0.yaml  # documentation only — scripts load fields explicitly
+
+champion:
+  sample_id: local_00022
+  mask_path: data/phase1/meep_search_local/candidates/masks/local_00022_mask.npy
+  meep_split: 0.5004660434960048
+  sigma: 0.0139193747656368
+
+data:
+  root: data/phase0          # latents + masks from decode_batch
+  phase1_root: data/phase1   # search / AL / exports
+  manifest: data/phase0/manifest.csv
+  sim_corpus_v1: data/phase0/sim_results_phase0_v1_all.csv
+  surrogate: data/phase1/surrogate_mask_v1_full
+
+meep:
+  recipe_version: phase0_v1   # use phase0_v2 after calibration pass
+  mask_flip_y: true
+  resolution: 25
+
+targets:
+  split_ratio_1550: 0.5
+  split_ratio_tolerance: 0.05
+  max_insertion_loss_db: 12.0
+
+search:
+  method: meep_native
+  objective: multi          # split | multi
+  weight_split: 1.0
+  weight_il: 0.15
+  n_trials_global: 150
+  n_trials_local: 50
+  sigma_center: 0.0139193747656368
+  sigma_min: 0.008
+  sigma_max: 0.035
+  drc_penalty: 1.0
+
+surrogate_presearch:
+  n_proposals: 800
+  top_k: 40
+  meep_verify_top_k: 12
+  sigma_min: 0.008
+  sigma_max: 0.04
+  require_ranking_wins: true
+  ranking_eval: data/phase1/surrogate_ranking_eval.json
+
+active_learning:
+  architecture: mask_mlp
+  source_filter: all
+  merge_sim_into: data/phase0/sim_results_phase0_v1_all.csv
+
+export:
+  pitch_um: 4.0
+  layer: 1
+  datatype: 0

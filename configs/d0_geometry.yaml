@@ -1,0 +1,27 @@
+# Phase D0 — smooth geometry recipes on champion panel
+
+gate:
+  max_mesh_gap: 0.03
+  max_prod_delta: 0.03
+
+champions:
+  - id: local_00022
+    mask: data/phase1/meep_search_local/candidates/masks/local_00022_mask.npy
+  - id: meep_bo_00128
+    mask: data/phase1/meep_search_deep/candidates/masks/meep_bo_00128_mask.npy
+  - id: meep_bo_00093
+    mask: data/phase0/meep_search_100/candidates/masks/meep_bo_00093_mask.npy
+
+experiments:
+  - { recipe: phase0_v1, res: 25, label: prod_r25 }
+  - { recipe: phase0_v1, res: 50, label: prod_r50 }
+  - { recipe: phase0_v1_sdf, res: 25, label: sdf_r25, extra: { sdf_smooth_um: 0.04 } }
+  - { recipe: phase0_v1_sdf, res: 50, label: sdf_r50, extra: { sdf_smooth_um: 0.04 } }
+  - { recipe: phase0_v1_sdf, res: 25, label: sdf_wide_r25, extra: { sdf_smooth_um: 0.08 } }
+  - { recipe: phase0_v1_sdf, res: 50, label: sdf_wide_r50, extra: { sdf_smooth_um: 0.08 } }
+  - { recipe: phase0_v1_sdf_geom, res: 25, label: sdf_geom_r25, extra: { sdf_smooth_um: 0.04 } }
+  - { recipe: phase0_v1_sdf_geom, res: 50, label: sdf_geom_r50, extra: { sdf_smooth_um: 0.04 } }
+  - { recipe: phase0_v1_sdf_cal, res: 25, label: sdf_cal_r25 }
+  - { recipe: phase0_v1_sdf_cal, res: 50, label: sdf_cal_r50 }
+  - { recipe: phase0_v1_matgrid_cal, res: 25, label: matgrid_cal_r25 }
+  - { recipe: phase0_v1_matgrid_cal, res: 50, label: matgrid_cal_r50 }

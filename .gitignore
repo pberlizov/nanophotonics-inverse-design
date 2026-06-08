@@ -1,0 +1,37 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+data/
+external/drcgenerator/
+
+*.npy
+*.h5
+*.hdf5
+
+.DS_Store
+.env
+.env.*
+*.log
+
+# LaTeX build artifacts (keep manuscript.pdf tracked separately if desired)
+docs/preprint/*.aux
+docs/preprint/*.bbl
+docs/preprint/*.blg
+docs/preprint/*.out
+docs/preprint/*.log
+docs/preprint/*.synctex.gz
+
+# MEEP / sim scratch (do not commit transient FDTD dumps)
+**/meep_fields/
+**/tmp_meep/
+**/*_scratch/
+
+# Local secrets / API config
+.tidy3d/
+**/.tidy3d/
+**/credentials.json
+**/secrets.*

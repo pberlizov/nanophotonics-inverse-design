@@ -1,0 +1,36 @@
+# MEEP-aligned refine: minimize (surrogate split − 0.5)² in z (prod labels via ranker).
+# Product path: STE decode + trust region → verify prod r25 (|split−0.5| < 0.03).
+# Product script defaults: --refine-when-off-target-only (corpus phase0_v1 r25).
+
+prefer_surrogate_improved: true
+refine_when_off_target_only: false
+prod_split_tol: 0.03
+prod_penalty_weight: 0.0
+surrogate: data/phase0/surrogate_v1_post_meep/surrogate.joblib
+target_split: 0.5
+sigma: 0.02
+decode: ste
+output_dir: data/phase1/refine_surrogate_ste
+
+trust_region:
+  enabled: true
+  lambda: 80.0  # ~3–5% mask Δ for champions at 40 steps
+
+optimizer:
+  steps: 50
+  steps_trust: 40
+  learning_rate: 0.02
+  learning_rate_trust: 0.008
+  grad_clip_norm: 1.0
+
+champions:
+  - id: local_00022
+    latent: data/phase1/meep_search_local/candidates/latents/local_00022_latent.npy
+  - id: meep_bo_00128
+    latent: data/phase1/meep_search_deep/candidates/latents/meep_bo_00128_latent.npy
+  - id: meep_bo_00093
+    latent: data/phase0/meep_search_100/candidates/latents/meep_bo_00093_latent.npy
+  - id: cand_000003
+    latent: data/phase1/wedge_a/meep_gated_shortlist/round3/latents/cand_000003_latent.npy
+  - id: cand_000261
+    latent: data/phase1/wedge_a/meep_gated_shortlist/round_rank/latents/cand_000261_latent.npy

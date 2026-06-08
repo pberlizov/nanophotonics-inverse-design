@@ -1,0 +1,33 @@
+# Sprint v2 morph — build on Phase2 asymmetric hunt (best worst=0.092, fail max_delta=0.12).
+# Hypothesis: seed morph2_perlin_0055, tighten residual, add 15nm stress, raise asymmetric weight.
+
+phase: sprint_v2
+targets:
+  split_ratio_1550: 0.5
+  split_ratio_tolerance: 0.05
+
+meep:
+  recipe_version: phase0_v1
+  resolution: 25
+  mask_flip_y: true
+
+search:
+  weight_nominal: 0.25
+  weight_asymmetric: 2.5
+  drc_penalty: 1.0
+
+morph:
+  upscale: 5
+  stress_nm_levels: [10, 15, 20]
+  max_delta_R_up: 0.05
+
+hunt:
+  output_dir: data/phase1/sprint_morph_v2
+  perlin_trials: 60
+  trials_per_center: 80
+  residual_dims: 16
+  residual_bound: 0.03
+  center_latents:
+    - data/phase1/phase2_morph_hunt/candidates/latents/morph2_perlin_0055_latent.npy
+    - data/phase1/meep_search_local/candidates/latents/local_00022_latent.npy
+    - data/phase0/meep_search_100/candidates/latents/meep_bo_00093_latent.npy

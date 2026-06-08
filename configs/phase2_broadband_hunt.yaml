@@ -1,0 +1,36 @@
+# Phase 2 C-band: A) Perlin from scratch  B) flatness  C) fine λ grid  D) 200 trials
+
+phase: 2
+targets:
+  split_ratio_1550: 0.5
+  split_ratio_tolerance: 0.05
+  max_insertion_loss_db: 12.0
+
+meep:
+  recipe_version: phase0_v1
+  resolution: 25
+  mask_flip_y: true
+
+data:
+  root: data/phase0
+  manifest: data/phase0/manifest.csv
+
+search:
+  objective: broadband
+  weight_split: 1.0
+  weight_il: 0.10
+  flatness_weight: 0.50
+  drc_penalty: 1.0
+
+broadband:
+  wl_start: 1.53
+  wl_stop: 1.57
+  wl_step: 0.005
+  max_worst_split_error: 0.05
+
+track_b:
+  latent_meep_search:
+    output_dir: data/phase1/phase2_broadband_hunt/explore
+    objective: broadband
+    latent_mode: perlin
+    n_trials_full: 200

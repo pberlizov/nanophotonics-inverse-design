@@ -1,0 +1,18 @@
+# B6 — Second target: 70/30 power splitter (same pipeline, new FOM)
+# Use with: --config configs/phase2_splitter_70_30.yaml on search scripts
+
+phase: 2
+device: power_splitter_70_30
+extends: phase1_track_b
+
+targets:
+  split_ratio_1550: 0.7
+  split_ratio_tolerance: 0.05
+  max_insertion_loss_db: 12.0
+
+search:
+  objective: multi
+
+track_b:
+  latent_meep_search:
+    output_dir: data/phase2/splitter_70_30/latent_meep_search

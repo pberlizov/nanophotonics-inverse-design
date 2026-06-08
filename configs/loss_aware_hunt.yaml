@@ -1,0 +1,30 @@
+# Phase B — IL as additional objective (required before arXiv upload).
+# Uses SearchConfig objective: multi (split + soft IL penalty).
+
+phase: publication_b
+targets:
+  split_ratio_1550: 0.5
+  split_ratio_tolerance: 0.05
+
+meep:
+  recipe_version: phase0_v1
+  resolution: 25
+  mask_flip_y: true
+
+search:
+  objective: multi
+  weight_split: 1.0
+  weight_il: 0.15
+  max_insertion_loss_db: 12.0   # penalty kicks in above this (soft cap)
+  drc_penalty: 1.0
+
+hunt:
+  output_dir: data/phase1/loss_aware_hunt
+  trials_per_center: 40
+  residual_dims: 16
+  residual_bound: 0.035
+  center_latents:
+    - data/phase1/wedge_a/meep_gated_shortlist/round_rank/latents/cand_000261_latent.npy
+    - data/phase1/meep_search_local/candidates/latents/local_00022_latent.npy
+    - data/phase1/meep_search_local/candidates/latents/meep_bo_00093_latent.npy
+    - data/phase1/wedge_a/meep_gated_shortlist/round_rank/latents/cand_000160_latent.npy

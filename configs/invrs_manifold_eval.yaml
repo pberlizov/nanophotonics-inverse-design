@@ -1,0 +1,14 @@
+# Evaluate MEEP champions on invrs-gym Ceviche (external benchmark bridge)
+
+challenge: ceviche_lightweight_power_splitter
+# challenge: ceviche_power_splitter  # 160×160 grid, slower
+
+samples:
+  - id: local_00022
+    mask: data/phase1/meep_search_local/candidates/masks/local_00022_mask.npy
+  - id: meep_bo_00128
+    mask: data/phase1/meep_search_deep/candidates/masks/meep_bo_00128_mask.npy
+  - id: meep_bo_00093
+    mask: data/phase0/meep_search_100/candidates/masks/meep_bo_00093_mask.npy
+  - id: ref_published
+    mask: data/phase0/masks/ref_published_mask.npy

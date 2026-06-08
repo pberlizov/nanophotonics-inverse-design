@@ -1,0 +1,47 @@
+# Improved wedge A ranker — post-replication corpus merge + training tricks.
+# Run: bash scripts/run_post_replication_improvements.sh
+
+base_config: configs/wedge_a_production.yaml
+
+wedge: A_improved
+
+surrogate:
+  architecture: mask_mlp
+  source_filter: perturb_plus_search
+  target: split_ratio_upper
+  output_dir: data/phase1/wedge_a/surrogate_improved
+  min_ok: 80
+  mask_pool: 6
+  hidden: "256,128,64"
+  max_iter: 800
+  # Near-target filter (0.15) hurt val R² on merged corpus; use full σ-local set.
+  sigma_feature: true
+  decode_masks_from_latent: true
+  sample_weight_mode: in_spec_boost
+  sample_weight_in_spec_tol: 0.05
+  champion_weight: 2.0
+
+ranking_gate:
+  top_k: 20
+  sources: perturb_plus_search
+  require_ranking_wins: true
+
+champions:
+  enabled: true
+  latent_paths:
+    - data/phase0/latents/ref_published_latent.npy
+    - data/phase1/meep_search_local/candidates/latents/local_00022_latent.npy
+    - data/phase1/meep_search_deep/candidates/latents/meep_bo_00128_latent.npy
+    - data/phase1/wedge_a/meep_gated_shortlist/latents/cand_000160_latent.npy
+    - data/phase1/wedge_a/meep_gated_shortlist/round_rank/latents/cand_000261_latent.npy
+
+sim_budget:
+  # Expert baseline from 5× replication; trim optional policies to save MEEP.
+  policies:
+    - random_perturb
+    - sigma_meep
+    - surrogate_rank
+    - hierarchical_35
+  hierarchical_sigma_fraction: 0.35
+  diverse_top_k: true
+  diverse_min_hamming: 0.02

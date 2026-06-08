@@ -1,0 +1,13 @@
+# R² deep work: joint pairwise rank + MSE (higher MSE weight).
+base_config: configs/wedge_a_improved.yaml
+
+wedge: A_r2_joint
+
+surrogate:
+  output_dir: data/phase1/wedge_a/surrogate_r2_joint
+  target: split_ratio_upper
+  loss_mode: pairwise_rank
+  rank_mse_weight: 0.45
+
+ranking_gate:
+  require_ranking_wins: true
