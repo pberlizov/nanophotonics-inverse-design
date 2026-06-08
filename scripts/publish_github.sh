@@ -36,7 +36,9 @@ EOF
 )"
 fi
 
-if ! git remote get-url origin >/dev/null 2>&1; then
+if git remote get-url origin >/dev/null 2>&1; then
+  git remote set-url origin "$REMOTE"
+else
   git remote add origin "$REMOTE"
 fi
 
@@ -44,7 +46,13 @@ if gh repo view pberlizov/nanophotonics-inverse-design >/dev/null 2>&1; then
   echo "Repo exists — pushing to origin main"
   git push -u origin main
 else
-  gh repo create pberlizov/nanophotonics-inverse-design --public --source=. --remote=origin --push
+  # Repo may not exist yet; --remote=origin fails if origin already configured
+  if gh repo create pberlizov/nanophotonics-inverse-design --public --source=. --remote=origin --push 2>&1; then
+    :
+  else
+    echo "gh repo create reported an error (often remote already set) — pushing anyway"
+    git push -u origin main
+  fi
 fi
 
 gh repo edit pberlizov/nanophotonics-inverse-design --visibility public 2>/dev/null || true

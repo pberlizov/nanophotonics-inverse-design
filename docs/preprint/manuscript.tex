@@ -31,7 +31,8 @@
 \maketitle
 
 \begin{abstract}
-We study a reproducible search \emph{pattern} for DRC-feasible silicon 1$\times$2 splitters: sample on a generative manifold, rank with a lightweight surrogate, and promote only MEEP-verified layouts under a frozen forward-model contract (\texttt{phase0\_v1}).
+We study a reproducible search \emph{pattern} for \textbf{DRC-manifold-feasible} silicon 1$\times$2 splitters: sample on a generative manifold, rank with a lightweight surrogate, and promote only MEEP-verified layouts under a frozen forward-model contract (\texttt{phase0\_v1}).
+Here ``DRC-feasible'' means feasible under the \texttt{drcgenerator} EBeamModel generative rules, not foundry sign-off DRC.
 The primary gate is a balanced upper-arm fraction $R_{\mathrm{up}} \approx 0.50$ at 1550\,nm ($|R_{\mathrm{up}}-0.5|\le 0.05$); every reported number uses the same 2D TE recipe on 180$\times$180 masks in a 4\,$\mu$m design region.
 
 In a six-seed pilot at matched MEEP budgets $B\in\{30,50,100\}$, surrogate-ranked search yields the highest mean verified in-spec count at $B{=}100$ ($15.7\pm 3.3$ of $B$) and the lowest mean best split error ($0.0037\pm 0.0030$), with paired wins 4/6 vs.\ $\sigma$-only MEEP BO and a 3/6 tie vs.\ hierarchical $\sigma$-search---evidence that ranking concentrates simulation dollars on better split candidates, not a statistically definitive policy ordering ($n{=}6$).
@@ -68,7 +69,7 @@ Six search policies are compared at matched MEEP budgets over six independent se
 This preprint is a methods starting point, not a device datasheet.
 We claim:
 \begin{enumerate}
-  \item A reproducible MEEP-gated loop on a DRC-feasible manifold: sample $\to$ surrogate rank $\to$ MEEP verify $\to$ corpus, with open artifacts under \texttt{data/phase0/} and \texttt{data/phase1/}.
+  \item A reproducible MEEP-gated loop on a generator-rule-feasible manifold: sample $\to$ surrogate rank $\to$ MEEP verify $\to$ corpus, with open artifacts at \url{https://github.com/pberlizov/nanophotonics-inverse-design}.
   \item Pilot evidence ($n{=}6$ seeds) that surrogate-ranked search improves \emph{verified} 50/50 split-ratio yield per simulation dollar vs.\ random perturbation and $\sigma$-only MEEP BO at $B{=}100$, with paired-win accounting.
   \item Honest diagnostic negatives under the same contract: narrowband promotion $\neq$ C-band flatness; promoted masks are morph-fragile under pixel stress; flux-monitor IL and $T$ remain poor and uncalibrated to foundry insertion loss.
 \end{enumerate}
@@ -151,14 +152,15 @@ Small geometric edits can therefore flip the split by $\sim$0.11 while blind $\s
 \section{Search pipeline}
 \label{sec:pipeline}
 
-Figure~\ref{fig:pipeline} sketches the overall loop: sample on the DRC-feasible manifold, rank with a surrogate, verify shortlisted candidates in MEEP, and append verified labels to the corpus.
+Figure~\ref{fig:pipeline} sketches the overall loop: sample on the DRC-manifold-feasible search space, rank with a surrogate, verify shortlisted candidates in MEEP, and append verified labels to the corpus.
 The surrogate reduces the number of expensive forward simulations required to encounter good designs, but MEEP remains the sole authority for promotion.
 
 \subsection{DRC-feasible manifold}
 
 We use the external \texttt{drcgenerator} package with EBeamModel~\cite{Danis2026DRCManifold}.
-Each latent vector $\mathbf{z}$ decodes to a binary 180$\times$180 mask satisfying heuristic EBL design rules (minimum width/spacing on the training manifold).
-We do not run end-to-end differentiable manifold optimization as in Danis \emph{et al.}; instead, we borrow their decoder as the feasible search space, ensuring that every candidate mask is manufacturable under the model's rules before simulation.
+Each latent vector $\mathbf{z}$ decodes to a binary 180$\times$180 mask satisfying \emph{generator-rule} width/spacing constraints on the training manifold.
+\textbf{DRC-manifold-feasible} in this paper means passing those generative rules only; it is \emph{not} a foundry rule-deck sign-off.
+We do not run end-to-end differentiable manifold optimization as in Danis \emph{et al.}; instead, we borrow their decoder as the feasible search space, ensuring that every candidate mask satisfies the model's heuristic rules before simulation.
 
 Sampling modes cover both local refinement and exploration far from the published template:
 \begin{description}
@@ -171,19 +173,38 @@ Together, these modes let the pipeline both polish near-reference layouts and di
 \subsection{Surrogate pre-filter (ranking, not sign-off)}
 
 Because MEEP dominates runtime, we train a lightweight mask MLP that maps decoded masks (plus optional $\sigma$ features) to a scalar score for pre-filtering.
-Training uses MEEP labels from \texttt{sim\_results\_phase0\_v1\_all.csv} ($>3600$ ok rows after merges).
-Two loss modes were compared to understand whether absolute regression or relative ordering better supports shortlist construction:
-\begin{itemize}
-  \item \textbf{Regression (MSE):} holdout $R^2 \approx -0.51$; val Spearman on $|R_{\mathrm{up}}-0.5|$ $\approx 0.38$.
-  \item \textbf{Pairwise rank (\texttt{surrogate\_improved\_rank}):} $R^2 \approx -19$ on val (worse, expected); Spearman $\approx 0.50$--$0.73$ depending on corpus snapshot; wins \texttt{ranking\_eval} against random top-$k$.
-\end{itemize}
+Training uses MEEP labels from \texttt{sim\_results\_phase0\_v1\_all.csv} (corpus snapshots differ by row count and source filter).
+Negative holdout $R^2$ is expected: most labels lie far from 50/50, so absolute error regression is ill-conditioned.
+The model's job is instead to sort $M \gg B$ proposals cheaply and let MEEP spend its budget on the top $B$; it never promotes a design on its own.
 
-Negative $R^2$ is expected in this regime: most labels lie far from 50/50, so predicting absolute split error is ill-conditioned.
-The model's job is instead to sort $M \gg B$ proposals cheaply and let MEEP spend its budget on the top $B$.
-It never promotes a design on its own.
+Table~\ref{tab:surrogate_snapshots} collects surrogate metrics that are easy to confuse across experiments.
+Rows differ by \emph{corpus snapshot}, \emph{train/val split}, \emph{loss mode}, and \emph{evaluation protocol}---not by accidental contradiction.
+The production shortlist model for \texttt{round\_rank} is \texttt{surrogate\_improved\_rank} (pairwise rank loss).
+A separate MSE baseline (\texttt{surrogate\_improved}) achieves higher top-20 in-spec counts on the same perturb+search holdout but is not the model deployed for MEEP-gated rounds.
+Proposal-pool ablation (row~5) scores \emph{fraction in-spec} within a fixed $n{=}500$ label pool with fast subsampling---a different statistic from holdout top-20 counts.
 
-Ranking evaluation on 3695 held-out rows (top-$k=20$) confirms the intended behavior: surrogate top-$k$ mean $|R_{\mathrm{up}}-0.5| = 0.059$ vs.\ random $0.221$; 13 vs.\ 1 in-spec in top-20 (\texttt{ranking\_wins=true}).
-In other words, the surrogate concentrates MEEP calls on layouts that are closer to balanced, even when it cannot predict $R_{\mathrm{up}}$ accurately in an $R^2$ sense.
+\begin{table}[t]
+  \centering
+  \caption{Surrogate validation snapshots (different corpora, splits, and metrics).}
+  \label{tab:surrogate_snapshots}
+  \small
+  \begin{tabular}{p{2.1cm}p{1.5cm}p{0.9cm}rrrrp{1.1cm}p{1.4cm}}
+    \toprule
+    Snapshot & Split & Loss & $n_{\mathrm{tr}}$ & $n_{\mathrm{val}}$ & $R^2$ & $\rho$ & top-$k$ in-spec & Artifact \\
+    \midrule
+    MSE improved holdout & 80/20 rand. & MSE & 2956 & 739 & $-0.51$ & 0.38 & 13 / 1 & \texttt{ranking\_eval\_improved.json} \\
+    Rank vs.\ MSE cmp. & same eval & MSE / rank & --- & --- & --- & 0.71 / 0.73 & 13 / 5 vs.\ 1 & \texttt{rank\_loss\_comparison.json} \\
+    Prod.\ rank holdout & 80/20 rand. & rank & 2610 & 653 & $-19$ & 0.50 & 5 / 1$^\dagger$ & \texttt{surrogate\_improved\_rank} \\
+    Merged full eval & holdout & rank & --- & 3191 & --- & 0.64 & 8 / 3 & \texttt{ranking\_eval\_merged\_full.json} \\
+    Proposal pool $K{=}20$ & pool $n{=}500$ & rank & --- & --- & --- & --- & 15\% / 10\% & \texttt{ablation\_proposal\_pool.json} \\
+    Val.\ random 80/20 & 80/20 rand. & rank & 2768 & 692 & $-9.1$ & 0.40 & 7 / 20 & \texttt{surrogate\_validation.json} \\
+    Val.\ $\sigma$-group & $\sigma$ groups & rank & 3245 & 215 & $-11.1$ & 0.46 & 8 / 20 & idem \\
+    Val.\ chronological & time split & rank & 301 & 25 & $-89$ & 0.08 & 6 / 6 & idem \\
+    \bottomrule
+  \end{tabular}
+  \\[0.3em]
+  {\footnotesize $R^2$ and $\rho$ are on $|R_{\mathrm{up}}-0.5|$ unless noted. top-$k$ in-spec: surrogate top-20 vs.\ random top-20 (rows 1--4, 6--8) or fraction in-spec (row 5). $^\dagger$Random baseline 1 from row~1 shared holdout.}
+\end{table}
 
 \subsection{MEEP-gated shortlist rounds}
 
@@ -271,8 +292,8 @@ Both regimes yield usable 50/50 candidates under the frozen contract, which sugg
 
 \subsection{Regression vs.\ ranking surrogate}
 
-On identical corpora, pairwise rank training raises Spearman on $|R_{\mathrm{up}}-0.5|$ from $\sim$0.71 (MSE baseline) to $\sim$0.73 (rank model snapshot), at the cost of worse raw $R^2$ and fewer in-spec in surrogate top-20 on some snapshots (13 vs.\ 5).
-Holdout $R^2$ therefore favors the regression model, while shortlist quality favors ranking---a tension resolved only by MEEP verification.
+On the shared perturb+search corpus (row~2 vs.\ row~3 in Table~\ref{tab:surrogate_snapshots}), pairwise rank training raises eval Spearman on $|R_{\mathrm{up}}-0.5|$ from $0.705$ (MSE) to $0.729$ (rank) but \emph{reduces} top-20 in-spec count from 13 to 5 vs.\ the same random top-20 baseline of 1 (\texttt{rank\_loss\_comparison.json}).
+Holdout $R^2$ therefore favors regression, while Spearman and MEEP outcomes favor the ranking model we actually deploy.
 The MEEP-gated \texttt{round\_rank} round is the decisive test: the best verified candidate beats regression-selected champions.
 In practice we train for ordering under a fixed MEEP budget, not for val $R^2$.
 
@@ -329,10 +350,12 @@ These are internally consistent simulation outcomes, not claims of deployable de
     Check & Outcome \\
     \midrule
     Split @ 1550\,nm ($|R_{\mathrm{up}}-0.5|\le 0.05$) & 5/5 champions pass \\
-    SDF mesh audit $R_{\mathrm{up}}$ @ r25--r75 & 0.500 flat (all panel + extended) \\
+    SDF mesh audit $R_{\mathrm{up}}$ @ r25--r75 & $\approx 0.500$ on sdf recipe (see \S\ref{sec:mesh}) \\
     Sim-budget $B{=}100$ in-spec mean & \texttt{surrogate\_rank} highest ($15.7\pm 3.3$) \\
     Sim-budget $B{=}100$ best $|R_{\mathrm{up}}-0.5|$ & \texttt{surrogate\_rank} lowest ($0.0037\pm 0.0030$) \\
-    Proposal-pool top-20 in-spec (rank vs.\ random) & 15\% vs.\ 10\% (+29\% enrichment) \\
+    Holdout top-20 in-spec (MSE vs.\ random, $n{=}3695$) & 13 vs.\ 1 \\
+    Holdout top-20 in-spec (rank vs.\ random, same split) & 5 vs.\ 1 \\
+    Proposal-pool ablation ($n{=}500$, $K{=}20$ fraction) & 15\% vs.\ 10\% (+29\% enrichment) \\
     Fab stress nominal & 5/5 in-spec \\
     \bottomrule
   \end{tabular}
@@ -355,9 +378,12 @@ Dual gate for champions:
 \end{enumerate}
 The first condition checks internal consistency of the audit recipe; the second checks agreement between audit and production discretizations.
 
-Six champions (\texttt{local\_00022}, \texttt{meep\_bo\_00128}, \texttt{meep\_bo\_00093}, \texttt{cand\_000160}, \texttt{cand\_000003}, \texttt{cand\_000261}) pass 6/6: at 50\,px/$\mu$m all show 0.500/0.500 with zero mesh gap on the sdf recipe.
-For \texttt{cand\_000261}, $|R_{\mathrm{up}}(\text{r25}) - R_{\mathrm{up}}(\text{prod})| = 0.005$.
-These results support promoting the champion panel on split ratio under the stated contract.
+Six champions (\texttt{local\_00022}, \texttt{meep\_bo\_00128}, \texttt{meep\_bo\_00093}, \texttt{cand\_000160}, \texttt{cand\_000003}, \texttt{cand\_000261}) pass 6/6 sdf-audit gates: $|R_{\mathrm{up}}(\text{r25}) - R_{\mathrm{up}}(\text{r50})| \le 0.03$ and $|R_{\mathrm{up}}(\text{r25}) - R_{\mathrm{up}}(\text{prod pixel})| \le 0.03$.
+On the sdf recipe, $R_{\mathrm{up}}$ at 25--75\,px/$\mu$m clusters near $0.500$ with sub-millipart-per-arm variation (e.g.\ \texttt{local\_00022}: $0.499999$ at r25 sdf vs.\ $0.4994$ on the production pixel grid at r25).
+The near-exact $0.500$ readout is \emph{not} a separate physics result: \texttt{phase0\_v1\_sdf\_geom} applies 0.04\,$\mu$m SDF smoothing to the pixel mask, which removes staircase discontinuities that drive resolution-sensitive splits on the raw pixel recipe (left panel of Figure~\ref{fig:mesh}).
+Promotion therefore uses sdf cross-checks for stability, while production labels remain on the pixel recipe.
+For \texttt{cand\_000261}, $|R_{\mathrm{up}}(\text{r25,sdf}) - R_{\mathrm{up}}(\text{r25,prod})| = 0.005$.
+These results support the champion panel on split ratio under the stated contract, not mesh-independent perfection.
 
 The extended panel includes failures too: \texttt{rnd\_100\_00016\_rep02} is in-spec on the pixel grid but misses the prod-offset gate by $|{\Delta}|=0.272$.
 Passing the champion audit does not imply mesh independence for arbitrary candidates---only that the promoted set behaves consistently on both recipes.
@@ -477,11 +503,11 @@ They show that IL can be driven down when the objective demands it, at a measura
 \subsection{Surrogate validation regimes}
 
 Surrogate quality depends on how the holdout set is constructed.
-We report three holdout regimes on the merged corpus (Table in \texttt{surrogate\_validation.md}): random 80/20 ($R^2\approx -9$ on $|R_{\mathrm{up}}-0.5|$), $\sigma$-grouped holdout ($R^2\approx -11$), and chronological train-pre-AL / test-gated-shortlist ($R^2\approx -89$, $n_{\mathrm{val}}{=}25$).
-Spearman on $|R_{\mathrm{up}}-0.5|$ is $\sim$0.40--0.46 under random and grouped splits; ranking top-20 by surrogate error does not beat an oracle random top-20 on held-out \emph{absolute} error in these snapshots.
-
-The $\sigma$-grouped diagnostic ($R^2\approx 0.45$ on $|R_{\mathrm{up}}-0.5|$ elsewhere in this work) remains the intended regression sanity check when perturbation balls do not leak between train and validation.
-Even there, MEEP shortlist outcomes are the promotion metric: a surrogate is useful if it improves verified yield at fixed budget, not if it wins a random holdout on absolute split error.
+Rows~6--8 in Table~\ref{tab:surrogate_snapshots} report three diagnostic regimes on the merged corpus (\texttt{surrogate\_validation.json}): random 80/20, $\sigma$-grouped holdout, and chronological train-pre-AL / test-gated-shortlist ($n_{\mathrm{val}}{=}25$).
+Under these splits the rank MLP often \emph{loses} to random top-20 on mean absolute error (e.g.\ random-holdout: surrogate mean $|{\mathrm{err}}|{=}0.102$ vs.\ random $0.006$) even when Spearman remains $\sim$0.40--0.46.
+That is consistent with val sets enriched for near-50/50 shortlist rows: random draws can land on easy in-spec labels by chance.
+These regimes are \textbf{sanity checks}, not the metric used to justify MEEP-gated search.
+MEEP shortlist outcomes and sim-budget yield (Table~\ref{tab:budget100}) remain the promotion-facing evidence.
 
 \section{Discussion}
 \label{sec:discussion}
