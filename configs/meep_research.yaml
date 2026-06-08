@@ -1,0 +1,32 @@
+# MEEP research experiment matrix — see docs/MEEP_RESEARCH_ARC.md
+
+champions:
+  - id: local_00022
+    mask: data/phase1/meep_search_local/candidates/masks/local_00022_mask.npy
+  - id: meep_bo_00128
+    mask: data/phase1/meep_search_deep/candidates/masks/meep_bo_00128_mask.npy
+  - id: meep_bo_00093
+    mask: data/phase0/meep_search_100/candidates/masks/meep_bo_00093_mask.npy
+
+# Reference production recipe for |r25 − prod| scoring
+reference:
+  recipe_version: phase0_v1
+  resolution: 25
+
+# Promotion gate thresholds
+gate:
+  max_mesh_gap: 0.03
+  max_prod_delta: 0.03
+
+# (recipe_version, resolution, short label)
+experiments:
+  - { recipe: phase0_v1, res: 25, label: prod_r25 }
+  - { recipe: phase0_v1, res: 50, label: prod_r50 }
+  - { recipe: phase0_v1_matgrid, res: 25, label: matgrid_r25 }
+  - { recipe: phase0_v1_matgrid, res: 50, label: matgrid_r50 }
+  - { recipe: phase0_v1_fullcell_matgrid, res: 25, label: fullcell_r25 }
+  - { recipe: phase0_v1_fullcell_matgrid, res: 50, label: fullcell_r50 }
+  - { recipe: phase0_v1_fullcell_matgrid_avg, res: 25, label: fullcell_avg_r25 }
+  - { recipe: phase0_v1_fullcell_matgrid_avg, res: 50, label: fullcell_avg_r50 }
+  - { recipe: phase0_v1_refgrid100n, res: 25, label: refgrid100n_r25 }
+  - { recipe: phase0_v1_refgrid100n, res: 50, label: refgrid100n_r50 }

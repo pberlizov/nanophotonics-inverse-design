@@ -1,0 +1,11 @@
+# Wedge A ranker — pairwise rank loss (RankNet + LambdaRank-lite pair weights).
+# Requires: uv pip install torch --python .venv/bin/python
+
+base_config: configs/wedge_a_improved.yaml
+
+wedge: A_rank
+
+surrogate:
+  output_dir: data/phase1/wedge_a/surrogate_improved_rank
+  loss_mode: pairwise_rank
+  rank_mse_weight: 0.15

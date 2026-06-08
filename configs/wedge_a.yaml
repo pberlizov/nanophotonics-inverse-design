@@ -1,0 +1,56 @@
+# Wedge A — sim-budget inverse design on-manifold
+# See docs/WEDGE_A.md
+
+wedge: A
+
+data:
+  root: data/phase0
+  manifest: data/phase0/manifest.csv
+  sim_corpus: data/phase0/sim_results_phase0_v1_all.csv
+  wedge_root: data/phase1/wedge_a
+
+meep:
+  recipe_version: phase0_v1
+  mask_flip_y: true
+  resolution: 25
+
+targets:
+  split_ratio_1550: 0.5
+  split_ratio_tolerance: 0.05
+  max_insertion_loss_db: 12.0
+
+surrogate:
+  architecture: latent_mlp
+  source_filter: perturb
+  output_dir: data/phase1/wedge_a/surrogate
+  min_ok: 50
+
+ranking_gate:
+  top_k: 20
+  sources: perturb
+  require_ranking_wins: true
+
+sim_budget:
+  budgets: [30, 50, 100]
+  budgets_pilot: [15, 30]
+  tolerance: 0.05
+  output_dir: data/phase1/wedge_a/sim_budget
+  policies:
+    - random_perturb
+    - sigma_meep
+    - surrogate_rank
+    - hierarchical
+  sigma_range: [0.008, 0.04]
+  proposals_multiplier: 25   # M = budget * multiplier for surrogate_rank
+  hierarchical_sigma_fraction: 0.5
+
+round:
+  n_proposals: 1000
+  meep_verify_k: 15
+  exploration: 0.1
+  merge_into: data/phase0/sim_results_phase0_v1_all.csv
+
+search:
+  objective: multi
+  weight_split: 1.0
+  weight_il: 0.15

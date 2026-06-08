@@ -1,0 +1,21 @@
+# Matgrid geometry sweep — meep_bo_00093 (baseline matgrid gap 0.09, large prod offset)
+
+gate:
+  max_mesh_gap: 0.03
+  max_prod_delta: 0.03
+
+output_tag: meep_bo_00093
+
+champions:
+  - id: meep_bo_00093
+    mask: data/phase0/meep_search_100/candidates/masks/meep_bo_00093_mask.npy
+
+sweep:
+  wg_width_um: [0.43, 0.45, 0.47]
+  arm_y: [0.55, 0.58, 0.60, 0.62]
+  arm_half_height_um: [0.24, 0.26, 0.28]
+  port_overlap_um: [0.0, 0.06, 0.10]
+  eps_averaging: [false, true]
+  matgrid_upsample: [1]
+
+resolutions: [25, 50]

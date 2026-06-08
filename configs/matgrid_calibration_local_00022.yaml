@@ -1,0 +1,21 @@
+# Focused matgrid geometry sweep — local_00022 (~|r25−prod| 0.039 at arm=0.60 seed)
+
+gate:
+  max_mesh_gap: 0.03
+  max_prod_delta: 0.03
+
+output_tag: local_00022
+
+champions:
+  - id: local_00022
+    mask: data/phase1/meep_search_local/candidates/masks/local_00022_mask.npy
+
+sweep:
+  wg_width_um: [0.42, 0.43, 0.44]
+  arm_y: [0.58, 0.59, 0.60, 0.61, 0.62]
+  arm_half_height_um: [0.24, 0.25, 0.26]
+  port_overlap_um: [0.0, 0.04, 0.06]
+  eps_averaging: [false, true]
+  matgrid_upsample: [1]
+
+resolutions: [25, 50]

@@ -1,0 +1,64 @@
+# Internal benchmark pilot — 50/50 C-band EBL splitter on drcgenerator manifold.
+# Run: bash scripts/run_pilot.sh --config configs/pilot/benchmark_50_50.yaml
+# Report only (no MEEP): bash scripts/run_pilot.sh --config configs/pilot/benchmark_50_50.yaml --report-only
+
+base_config: configs/wedge_a.yaml
+
+pilot:
+  id: benchmark_50_50
+  title: "C-band 50/50 EBL power splitter — benchmark pilot"
+  client_name: "Internal benchmark (outreach template)"
+  company_name: "[Your lab / company]"
+  contact_email: "[you@example.com]"
+  platform: "EBL research — drcgenerator 50/50 splitter manifold"
+  wavelength_nm: "1550"
+  duration_weeks: 6
+  contract_date: "2026-05-24"
+
+deliverables:
+  dir: data/pilot/benchmark_50_50/deliverables
+  top_k: 5
+  include_gds: true
+  pitch_um: 4.0
+
+champions:
+  - sample_id: local_00022
+    mask_path: data/phase1/meep_search_local/candidates/masks/local_00022_mask.npy
+    split_ratio_upper: 0.500
+    insertion_loss_db: null
+    source: "MEEP σ-local search"
+  - sample_id: meep_bo_00128
+    mask_path: data/phase1/meep_search_deep/candidates/masks/meep_bo_00128_mask.npy
+    split_ratio_upper: 0.509
+    insertion_loss_db: 15.06
+    source: "MEEP multi-objective search (150 trials)"
+  - sample_id: meep_bo_00093
+    mask_path: data/phase0/meep_search_100/candidates/masks/meep_bo_00093_mask.npy
+    split_ratio_upper: 0.497
+    insertion_loss_db: 16.66
+    source: "Phase 0 MEEP gate champion"
+
+sources:
+  metrics_path: data/phase1/wedge_a/wedge_a_metrics.json
+  ranking_eval: data/phase1/wedge_a/ranking_eval_improved.json
+  sim_budget_replication: data/phase1/wedge_a/sim_budget_replication_report.md
+  sim_budget_dir: data/phase1/wedge_a/sim_budget
+  sim_budget_policy: surrogate_rank
+  sim_budget_budget: 100
+
+outreach:
+  dir: data/pilot/benchmark_50_50/outreach
+
+timeline:
+  - week: 1
+    milestone: "Kickoff — spec, platform, success criteria signed"
+  - week: 2
+    milestone: "Train ranker on corpus; ranking gate"
+  - week: 3
+    milestone: "Sim-budget study + surrogate shortlist MEEP verify"
+  - week: 4
+    milestone: "Optional AL round; refine top designs"
+  - week: 5
+    milestone: "Deliverable dossier (masks, metrics, GDS)"
+  - week: 6
+    milestone: "Readout + sim contract handoff"

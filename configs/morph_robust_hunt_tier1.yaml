@@ -1,0 +1,32 @@
+# Tier 1 morph-robust rerun: more centers, multi-level stress, stability-first loss.
+
+phase: 0
+targets:
+  split_ratio_1550: 0.5
+  split_ratio_tolerance: 0.05
+
+meep:
+  recipe_version: phase0_v1
+  resolution: 25
+  mask_flip_y: true
+
+search:
+  drc_penalty: 1.0
+  # loss = weight_max_delta * max_delta_R_up + weight_worst * worst_split_error
+  weight_max_delta: 1.0
+  weight_worst: 2.0
+
+morph:
+  upscale: 5
+  stress_nm_levels: [10, 20]
+  max_delta_R_up: 0.05
+
+hunt:
+  output_dir: data/phase1/morph_robust_hunt_tier1
+  trials_per_center: 80
+  residual_dims: 16
+  residual_bound: 0.05
+  center_latents:
+    - data/phase1/meep_search_local/candidates/latents/local_00022_latent.npy
+    - data/phase0/meep_search_100/candidates/latents/meep_bo_00093_latent.npy
+    - data/phase1/wedge_a/meep_gated_shortlist/round_rank/latents/cand_000261_latent.npy

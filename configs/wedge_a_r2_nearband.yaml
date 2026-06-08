@@ -1,0 +1,14 @@
+# R² deep work: train on near-target band only (|err| <= 0.12).
+base_config: configs/wedge_a_improved.yaml
+
+wedge: A_r2_nearband
+
+surrogate:
+  output_dir: data/phase1/wedge_a/surrogate_r2_nearband
+  target: split_ratio_upper
+  near_target_max_abs_err: 0.12
+  loss_mode: regression
+  sample_weight_mode: soft_target
+
+ranking_gate:
+  require_ranking_wins: false

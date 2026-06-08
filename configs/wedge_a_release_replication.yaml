@@ -1,0 +1,12 @@
+# Release-grade sim-budget replication: B=30,50,100,200 · use with N_REPLICATES=20.
+base_config: configs/wedge_a_production.yaml
+
+wedge: A_release_replication
+
+sim_budget:
+  budgets: [30, 50, 100, 200]
+
+replication:
+  output_dir: data/phase1/wedge_a/sim_budget/replicates
+  metrics_aggregate: data/phase1/wedge_a/sim_budget_replicates.json
+  report_md: data/phase1/wedge_a/sim_budget_replication_report.md

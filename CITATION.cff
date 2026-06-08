@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+title: "MEEP-Gated Search on DRC Manifolds for Silicon 1×2 Power Splitters"
+message: "If you use this software or data, please cite it as below."
+authors:
+  - family-names: Berlizov
+    given-names: Petr
+    affiliation: Harvard University
+repository-code: "https://github.com/pberlizov/nanophotonics-inverse-design"
+license: MIT
+version: 1.0-preprint
+date-released: 2026-06-08
+preferred-citation:
+  type: article
+  title: "MEEP-Gated Search on DRC Manifolds for Silicon 1×2 Power Splitters"
+  authors:
+    - family-names: Berlizov
+    given-names: Petr
+  year: 2026
+  month: 6
+  notes: "Preprint. Simulation-only study under frozen MEEP phase0_v1 recipe."

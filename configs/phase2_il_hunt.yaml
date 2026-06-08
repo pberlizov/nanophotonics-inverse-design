@@ -1,0 +1,29 @@
+# Phase 2 IL: A) strong weight_il  B) two-stage  C) Perlin/sigma seeds (no champion centers)
+
+phase: 2
+targets:
+  split_ratio_1550: 0.5
+  split_ratio_tolerance: 0.05
+  max_insertion_loss_db: 12.0
+
+meep:
+  recipe_version: phase0_v1
+  resolution: 25
+  mask_flip_y: true
+
+data:
+  root: data/phase0
+
+search:
+  objective: multi
+  weight_split: 1.0
+  weight_il: 0.75
+  drc_penalty: 1.0
+
+il_hunt:
+  output_dir: data/phase1/phase2_il_hunt
+  stage1_trials: 100
+  stage2_trials_per_seed: 30
+  stage2_top_seeds: 5
+  sigma_range: [0.02, 0.12]
+  stage2_split_penalty: 10.0

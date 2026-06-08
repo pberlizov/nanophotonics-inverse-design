@@ -1,0 +1,31 @@
+# Phase 2 morph: B) from trial 1  C) dilate-survivor centers  D) asymmetric erode/dilate loss
+
+phase: 2
+targets:
+  split_ratio_1550: 0.5
+  split_ratio_tolerance: 0.05
+
+meep:
+  recipe_version: phase0_v1
+  resolution: 25
+  mask_flip_y: true
+
+search:
+  weight_nominal: 0.5
+  weight_asymmetric: 1.0
+  drc_penalty: 1.0
+
+morph:
+  upscale: 5
+  stress_nm_levels: [10, 20]
+  max_delta_R_up: 0.05
+
+hunt:
+  output_dir: data/phase1/phase2_morph_hunt
+  perlin_trials: 80
+  trials_per_center: 100
+  residual_dims: 16
+  residual_bound: 0.05
+  center_latents:
+    - data/phase1/meep_search_local/candidates/latents/local_00022_latent.npy
+    - data/phase0/meep_search_100/candidates/latents/meep_bo_00093_latent.npy

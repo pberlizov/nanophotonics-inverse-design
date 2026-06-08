@@ -1,0 +1,12 @@
+# invrs-gym external benchmark — start with lightweight power splitter (fast dev loop)
+challenge: ceviche_lightweight_power_splitter
+seed: 0
+
+optimizer:
+  steps: 200
+  beta: 4.0
+  patience: 5
+  min_delta: 0.0001
+
+# Full-fidelity variant (160x160 design, slower):
+# challenge: ceviche_power_splitter

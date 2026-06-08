@@ -1,0 +1,18 @@
+# Validation replicate — B=100 only, headline policies, surrogate_improved.
+# Run: bash scripts/run_validation_replicate.sh
+
+base_config: configs/wedge_a_production.yaml
+
+wedge: A_validate_improved
+
+sim_budget:
+  budgets: [100]
+  policies:
+    - random_perturb
+    - sigma_meep
+    - surrogate_rank
+    - hierarchical_35
+
+replication:
+  validation_replicate_id: 6
+  validation_report: data/phase1/wedge_a/sim_budget_validation_improved.md

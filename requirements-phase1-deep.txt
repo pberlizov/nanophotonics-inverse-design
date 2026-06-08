@@ -1,0 +1,4 @@
+# Optional extras for Phase 1 deep dev (GDS export)
+# uv pip install -r requirements-phase1-deep.txt --python .venv/bin/python
+
+gdstk>=0.9

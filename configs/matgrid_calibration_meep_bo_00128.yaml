@@ -1,0 +1,21 @@
+# Full matgrid sweep on meep_bo_00128 (rebuild lost JSON from 2026-06-02 overwrite)
+
+gate:
+  max_mesh_gap: 0.03
+  max_prod_delta: 0.03
+
+output_tag: meep_bo_00128
+
+champions:
+  - id: meep_bo_00128
+    mask: data/phase1/meep_search_deep/candidates/masks/meep_bo_00128_mask.npy
+
+sweep:
+  wg_width_um: [0.43, 0.45, 0.47]
+  arm_y: [0.58, 0.60, 0.62]
+  arm_half_height_um: [0.24, 0.25, 0.26]
+  port_overlap_um: [0.0, 0.06]
+  eps_averaging: [false, true]
+  matgrid_upsample: [1]
+
+resolutions: [25, 50]

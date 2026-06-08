@@ -1,0 +1,67 @@
+# Phase 1 Track B — structural inverse-design improvements
+# See docs/PHASE1_TRACK_B.md
+
+phase: 1
+track: B
+
+data:
+  root: data/phase0
+  phase1_root: data/phase1
+  manifest: data/phase0/manifest.csv
+  sim_corpus_v1: data/phase0/sim_results_phase0_v1_all.csv
+
+meep:
+  recipe_version: phase0_v1
+  mask_flip_y: true
+  resolution: 25
+
+targets:
+  split_ratio_1550: 0.5
+  split_ratio_tolerance: 0.05
+  max_insertion_loss_db: 12.0
+
+search:
+  objective: multi
+  weight_split: 1.0
+  weight_il: 0.15
+
+track_b:
+  broadband_wavelengths_um: [1.50, 1.55, 1.60]
+
+  latent_meep_search:
+    output_dir: data/phase1/track_b/latent_meep_search
+    latent_mode: residual
+    residual_dims: 12
+    residual_bound: 0.06
+    objective: multi
+    n_trials_pilot: 20
+    n_trials_full: 80
+
+  template_search:
+    output_dir: data/phase1/track_b/template_search
+    template_bounds:
+      wg_width_um: [0.38, 0.48]
+      arm_y_upper: [0.50, 0.65]
+    n_trials_pilot: 15
+    n_trials_full: 50
+
+  surrogates:
+    output_root: data/phase1/track_b/surrogates
+    min_ok: 50
+
+  acquisition:
+    output_dir: data/phase1/track_b/acquisition
+    n_proposals_pilot: 200
+    n_proposals_full: 1000
+    top_k: 30
+    exploration: 0.1
+    default_surrogate: data/phase1/track_b/surrogates/perturb_latent_mlp
+
+  baselines:
+    output_dir: data/phase1/track_b/baselines
+    n_trials_pilot: 15
+    n_trials_full: 100
+
+  al_round:
+    round_start: 2
+    use_surrogate: data/phase1/track_b/surrogates/perturb_latent_mlp

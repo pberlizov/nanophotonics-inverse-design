@@ -1,0 +1,15 @@
+# Wedge A ranker — mask_mlp predicting |split - target| (often better R²)
+base_config: configs/wedge_a.yaml
+
+surrogate:
+  architecture: mask_mlp
+  source_filter: perturb_plus_search
+  min_ok: 80
+  target: abs_split_error
+  output_dir: data/phase1/wedge_a/surrogate_mask_abserr
+  mask_pool: 6
+  hidden: "256,128,64"
+  max_iter: 800
+
+ranking_gate:
+  require_ranking_wins: true

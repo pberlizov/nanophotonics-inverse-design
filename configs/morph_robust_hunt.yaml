@@ -1,0 +1,30 @@
+# Morphology-robust latent refinement (±10 nm erode/dilate on 5× fine grid).
+
+phase: 0
+targets:
+  split_ratio_1550: 0.5
+  split_ratio_tolerance: 0.05
+
+meep:
+  recipe_version: phase0_v1
+  resolution: 25
+  mask_flip_y: true
+
+search:
+  drc_penalty: 1.0
+  morph_weight: 1.0
+  split_weight: 1.0
+
+morph:
+  upscale: 5
+  stress_nm_levels: [10]
+  max_delta_R_up: 0.05
+
+hunt:
+  output_dir: data/phase1/morph_robust_hunt
+  trials_per_center: 30
+  residual_dims: 16
+  residual_bound: 0.035
+  center_latents:
+    - data/phase1/meep_search_local/candidates/latents/local_00022_latent.npy
+    - data/phase1/wedge_a/meep_gated_shortlist/round_rank/latents/cand_000261_latent.npy

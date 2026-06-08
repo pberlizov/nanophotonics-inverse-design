@@ -1,0 +1,13 @@
+# R² deep work: predict |split - 0.5| on full merged corpus.
+base_config: configs/wedge_a_improved.yaml
+
+wedge: A_r2_abserr
+
+surrogate:
+  output_dir: data/phase1/wedge_a/surrogate_r2_abserr
+  target: abs_split_error
+  loss_mode: regression
+  sample_weight_mode: rank_boost
+
+ranking_gate:
+  require_ranking_wins: true
